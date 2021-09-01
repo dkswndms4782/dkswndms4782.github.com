@@ -79,7 +79,7 @@
 
 <img src="https://user-images.githubusercontent.com/59716219/131550703-4cdfe353-15ec-4e3e-9997-479a814b3531.png" width="450" height="300">
 
-- Attention Value를 구하기 위해 가중합을 한다.(각 인코더의 은닉 상태오 어텐션 가중치값들을 곱하고, 최종적으 모두 더함)
+- Attention Value를 구하기 위해 가중합을 한다.(각 인코더의 은닉 상태오 어텐션 가중치값들을 곱하고, 최종적으로 모두 더함)
 - <img src="https://render.githubusercontent.com/render/math?math=a_t"> : Attention Value
 - <img src="https://render.githubusercontent.com/render/math?math=a_t = \sum_{i=1}^N\alpha_i^th_i">
 - Attention Value는 인코더의 컨텍스트 벡터라고도 한다. 
@@ -92,7 +92,7 @@
 
 - 어텐션 메커니즙은 <img src="https://render.githubusercontent.com/render/math?math=a_t">를 <img src="https://render.githubusercontent.com/render/math?math=s_t">와 결합(concatenate)함
 - 이 concatenate한 것을 <img src="https://render.githubusercontent.com/render/math?math=v_t">라고 함. 
-- <img src="https://render.githubusercontent.com/render/math?math=v_t">를 <img src="https://render.githubusercontent.com/render/math?math=\hat y">예측 연산의 입력으로 사용하므로서 인코더로부 얻은 정보를 활용하여 결과값을 예측하게 됨. 
+- <img src="https://render.githubusercontent.com/render/math?math=v_t">를 <img src="https://render.githubusercontent.com/render/math?math=\hat y">예측 연산의 입력으로 사용하므로서 인코더로부터 얻은 정보를 활용하여 결과값을 예측하게 됨. 
 
    ---
 
@@ -154,41 +154,42 @@
 
 > ## 1)어텐션 스코어(Attention Score)를 구한다.
 
-<img src="https://user-images.githubusercontent.com/59716219/131546588-24b8d4fb-e073-48e6-b652-9cf55ec01af5.png" width="500" height="300">
+<img src="https://user-images.githubusercontent.com/59716219/131597689-1b7c42aa-ce15-4633-94dd-31892fbacc5c.png" width="500" height="300">
 
-- <img src="https://render.githubusercontent.com/render/math?math=h_1, h_2, ... , h_N"> : 인코더의 각 시점의 은닉 상태
-- <img src="https://render.githubusercontent.com/render/math?math=s_t"> : 디코더의 시점 t에서의 은닉 상태
-- (인코더의 은닉 상태의 차원 == 디코더의 은닉 상태 차원)이라고 가정
-- `Attention Score` : 인코더의 모든 은닉 상태들이 디코더의 현재 은닉 상태 <img src="https://render.githubusercontent.com/render/math?math=s_t">와 얼마나 유사한지를 판단하는 스코어값
+- t-1시점의 은닉상태 <img src="https://render.githubusercontent.com/render/math?math=s_{t-1}">을 사용
+- <img src="https://render.githubusercontent.com/render/math?math=score(s_{t-1}, h_i) = W_a^Ttanh(W_bs_{t-1}"> + <img src="https://render.githubusercontent.com/render/math?math=W_ch_i)">
+   - 이때 <img src="https://render.githubusercontent.com/render/math?math=W_a, W_b, W_c">는 학습 가능한 가중치 행렬
+   - <img src="https://render.githubusercontent.com/render/math?math=s_{t-1}">와 <img src="https://render.githubusercontent.com/render/math?math=h_1, h_2, h_3, h_4">의 어텐션 스코어는 각각 구해야한다. 
+   - 병렬 연산을 위해 <img src="https://render.githubusercontent.com/render/math?math=h_1, h_2, h_3, h_4">를 하나의 행렬 H로 두자
+- <img src="https://render.githubusercontent.com/render/math?math=score(s_{t-1}, h_i) = W_a^Ttanh(W_bs_{t-1}"> + <img src="https://render.githubusercontent.com/render/math?math=W_cH)">
 
-   <img src="https://user-images.githubusercontent.com/59716219/131548585-0894a604-1e06-4f07-af7e-e5df7da55e9b.png" width="200" height="140">
+- <img src="https://render.githubusercontent.com/render/math?math=W_bs_{t-1}, W_cH">를 그림으로 보자
 
-- 현재 : dot product attention
-- 현재 어텐션 스코어를 구하기 위한 식 :  <img src="https://render.githubusercontent.com/render/math?math=score(s_t, h_i)  = s_t^Th_i">
-- 모든 어텐션 스코어 값은 스칼라
-- <img src="https://render.githubusercontent.com/render/math?math=e^t"> : 어텐션 스코어의 모음값
-- <img src="https://render.githubusercontent.com/render/math?math=e^t = [s_t^Th_1, ... , s_t^Th_N]">
+   <img src="https://user-images.githubusercontent.com/59716219/131598491-d260f7b0-db96-4b5d-b0da-db450f939f22.png" width="300" height="170">
+   
+- 이들을 더한 후, 하이퍼볼릭탄젠트 함수를 지나도록 한다. (현재까지 진행된 수식 <img src="https://render.githubusercontent.com/render/math?math=tanh(W_bs_{t-1}"> + <img src="https://render.githubusercontent.com/render/math?math=W_cH)">)
+   
+   <img src="https://user-images.githubusercontent.com/59716219/131598757-89dd12a7-11cd-474b-ba71-eea1eaa67202.png" width="300" height="150">
+   
+- <img src="https://render.githubusercontent.com/render/math?math=W_a^T">와 곱하여  <img src="https://render.githubusercontent.com/render/math?math=s_{t-1}, h_1, h_2, h_3, h_4">의 유사도가 기록된 어텐션 스코어 벡터  <img src="https://render.githubusercontent.com/render/math?math=e^t">를 얻는다.
 
    ---
    
 > ## 2)소프트맥스(softmax) 함수를 통해 어텐션 분포(Attention Distribution)를 구한다.
 
-<img src="https://user-images.githubusercontent.com/59716219/131549587-d4ea8cca-3ff7-42ab-be3d-b87466a8ee14.png" width="450" height="300">
+<img src="https://user-images.githubusercontent.com/59716219/131599260-f3840f83-c138-4099-8698-6d80bf7e29b9.png" width="300" height="150">
 
-- `어텐션 분포(Attention Distribution)` : <img src="https://render.githubusercontent.com/render/math?math=e^t">에 softmax함수를 적용한 것
-- `어텐션 가중치(Attention Weight)` : Attention Distribution의 각각의 값
-- <img src="https://render.githubusercontent.com/render/math?math={\alpha}^t = softmax(e^t)"> : 어텐션 분포
+- Attention Distribution : <img src="https://render.githubusercontent.com/render/math?math=e_t">에 소프트맥스 함수 적용한 것.
+- Attention Distribution에서 각각의 값은 어텐션 가중치(Attention Weight)라고 함.
 
    ---
 
 > ## 3) 각 인코더의 어텐션 가중치와 은닉 상태를 가중합하여 어텐션 값(Attention Value)을 구한다.
 
-<img src="https://user-images.githubusercontent.com/59716219/131550703-4cdfe353-15ec-4e3e-9997-479a814b3531.png" width="450" height="300">
+<img src="https://user-images.githubusercontent.com/59716219/131599530-df26b2d9-0393-4f39-ac10-7658c44857b9.png" width="250" height="100">
 
-- Attention Value를 구하기 위해 가중합을 한다.(각 인코더의 은닉 상태오 어텐션 가중치값들을 곱하고, 최종적으 모두 더함)
-- <img src="https://render.githubusercontent.com/render/math?math=a_t"> : Attention Value
-- <img src="https://render.githubusercontent.com/render/math?math=a_t = \sum_{i=1}^N\alpha_i^th_i">
-- Attention Value는 인코더의 컨텍스트 벡터라고도 한다. 
+- 어텐션의 최종 결과값을 얻기 위
+- 
 
    ---
 
@@ -198,6 +199,6 @@
 
 - 어텐션 메커니즙은 <img src="https://render.githubusercontent.com/render/math?math=a_t">를 <img src="https://render.githubusercontent.com/render/math?math=s_t">와 결합(concatenate)함
 - 이 concatenate한 것을 <img src="https://render.githubusercontent.com/render/math?math=v_t">라고 함. 
-- <img src="https://render.githubusercontent.com/render/math?math=v_t">를 <img src="https://render.githubusercontent.com/render/math?math=\hat y">예측 연산의 입력으로 사용하므로서 인코더로부 얻은 정보를 활용하여 결과값을 예측하게 됨. 
+- <img src="https://render.githubusercontent.com/render/math?math=v_t">를 <img src="https://render.githubusercontent.com/render/math?math=\hat y">예측 연산의 입력으로 사용하므로서 인코더로부터 얻은 정보를 활용하여 결과값을 예측하게 됨. 
 
 ---
