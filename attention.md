@@ -188,17 +188,19 @@
 
 <img src="https://user-images.githubusercontent.com/59716219/131599530-df26b2d9-0393-4f39-ac10-7658c44857b9.png" width="250" height="100">
 
-- 어텐션의 최종 결과값을 얻기 위
-- 
+- 어텐션의 최종 결과값을 얻기 위해 각 인코더의 은닉 상태와 어텐션 가중치값들을 곱하고, 최종적으로 모두 더한다. 
+- 가중합을 한다고 말할 수 있다. 
+- Attention Value는 인코더의 문맥을 포함하고 있다고 하여 Context Vector라고도 부름.
+
 
    ---
 
 > ## 4) 컨텍스트 벡터로부터 <img src="https://render.githubusercontent.com/render/math?math=s_t">를 구한다.
 
-<img src="https://user-images.githubusercontent.com/59716219/131589352-e2435cd2-dc6a-41bd-9bf5-e0f5a2795ae2.png" width="450" height="300">
+<img src="https://user-images.githubusercontent.com/59716219/131600470-03cf0f3c-79d3-4ca6-b60b-ffc51177140f.png" width="200" height="200"> <img src="https://user-images.githubusercontent.com/59716219/131600482-891b2388-df25-48b0-b52a-7318410b2321.png" width="200" height="200">
 
-- 어텐션 메커니즙은 <img src="https://render.githubusercontent.com/render/math?math=a_t">를 <img src="https://render.githubusercontent.com/render/math?math=s_t">와 결합(concatenate)함
-- 이 concatenate한 것을 <img src="https://render.githubusercontent.com/render/math?math=v_t">라고 함. 
-- <img src="https://render.githubusercontent.com/render/math?math=v_t">를 <img src="https://render.githubusercontent.com/render/math?math=\hat y">예측 연산의 입력으로 사용하므로서 인코더로부터 얻은 정보를 활용하여 결과값을 예측하게 됨. 
+- 바다나우 어텐션 메커니즘에서는 context vector와 현재 시점의 입력이 단어의 임베딩 벡터를 연결(concatenate)하고, 현 시점의 새로운 입력으로 사용
+- <img src="https://render.githubusercontent.com/render/math?math=s_{t-1}">과 현재 시점의 새로운 입력으로부터 <img src="https://render.githubusercontent.com/render/math?math=s_{t}">를 구한다.
+- <img src="https://render.githubusercontent.com/render/math?math=s_{t}">는 출력층으로 전달되어 현재 시점의 예측값을 구하게 된다. 
 
----
+
